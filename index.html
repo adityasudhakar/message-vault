@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Message Vault</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 680px; margin: 48px auto; padding: 0 20px; line-height: 1.45; }
+    input { width: 100%; box-sizing: border-box; padding: 12px; font-size: 16px; }
+    button { margin-top: 12px; padding: 10px 14px; font-size: 16px; cursor: pointer; }
+    #out { margin-top: 24px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; min-height: 48px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Message Vault</h1>
+  <p>Enter your key.</p>
+  <input id="key" placeholder="paste key here" autocomplete="off" autocapitalize="off" spellcheck="false" />
+  <button onclick="reveal()">Reveal</button>
+  <div id="out">No message loaded.</div>
+  <script>
+    async function reveal() {
+      const key = document.getElementById('key').value.trim();
+      const out = document.getElementById('out');
+      if (!/^[a-f0-9]{64}$/i.test(key)) { out.textContent = 'That key does not look right.'; return; }
+      try {
+        const res = await fetch(`messages/${key.toLowerCase()}.txt`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('not found');
+        out.textContent = await res.text();
+      } catch {
+        out.textContent = 'No message found for that key.';
+      }
+    }
+  </script>
+</body>
+</html>
